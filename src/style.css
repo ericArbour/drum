@@ -32,6 +32,10 @@ body {
   min-height: 100vh;
 }
 
+main > * {
+  margin-top: 1rem;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -61,6 +65,12 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+canvas {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: #1a1a1a;
 }
 
 @media (prefers-color-scheme: light) {
