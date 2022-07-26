@@ -32,6 +32,10 @@ body {
   min-height: 100vh;
 }
 
+main {
+  width: calc(100vw - 4rem);
+}
+
 main > * {
   margin-top: 1rem;
 }
@@ -68,6 +72,7 @@ button:focus-visible {
 }
 
 canvas {
+  margin: 2rem 0;
   border-radius: 8px;
   border: 1px solid transparent;
   background-color: #1a1a1a;
