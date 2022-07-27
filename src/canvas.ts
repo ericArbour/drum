@@ -65,11 +65,10 @@ export function setupCanvas(
   };
   canvasElement.addEventListener('pointerdown', handleClick);
 
-  let midi = null; // global MIDIAccess object
-  function onMIDISuccess(midiAccess: MIDIAccess) {
+  function onMIDISuccess(midiAccess: WebMidi.MIDIAccess) {
     console.log('MIDI ready!');
-    midi = midiAccess; // store in the global (in real usage, would probably keep in an object instance)
     webMidiSupportElement.innerHTML = 'Web MIDI is supported!';
+    listInputsAndOutputs(midiAccess);
   }
 
   function onMIDIFailure(msg: string) {
@@ -78,4 +77,26 @@ export function setupCanvas(
   }
 
   navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+}
+
+function listInputsAndOutputs(midiAccess: WebMidi.MIDIAccess) {
+  console.log(`Number of MIDI inputs: ${[...midiAccess.inputs].length}`);
+  for (const entry of midiAccess.inputs) {
+    const input = entry[1];
+    console.log(
+      `Input port [type:'${input.type}']` +
+        ` id:'${input.id}'` +
+        ` manufacturer:'${input.manufacturer}'` +
+        ` name:'${input.name}'` +
+        ` version:'${input.version}'`
+    );
+  }
+
+  console.log(`Number of MIDI outputs: ${[...midiAccess.outputs].length}`);
+  for (const entry of midiAccess.outputs) {
+    const output = entry[1];
+    console.log(
+      `Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`
+    );
+  }
 }
