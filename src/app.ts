@@ -7,6 +7,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <article>
       <h2>Canvas</h2>
       <canvas id="canvas"></canvas>
+      <button id="play-note-button">Play Note</button>
       <aside>
         <h3>WebMIDI Support</h3>
         <p id="web-midi-support">Checking if WebMIDI is supported...</p>
@@ -22,5 +23,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 setupCanvas(
   document.querySelector<HTMLCanvasElement>('#canvas')!,
   document.querySelector<HTMLParagraphElement>('#pointer-report')!,
-  document.querySelector<HTMLParagraphElement>('#web-midi-support')!
+  document.querySelector<HTMLParagraphElement>('#web-midi-support')!,
+  document.querySelector<HTMLButtonElement>('#play-note-button')!
 );

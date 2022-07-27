@@ -1,8 +1,11 @@
 export function setupCanvas(
   canvasElement: HTMLCanvasElement,
   pointerReportElement: HTMLParagraphElement,
-  webMidiSupportElement: HTMLParagraphElement
+  webMidiSupportElement: HTMLParagraphElement,
+  playNoteButtonElement: HTMLButtonElement
 ) {
+  let midi: WebMidi.MIDIAccess | null = null;
+  let firstOutputPort: string | null = null;
   // resize the canvas to fill browser window dynamically
   window.addEventListener('resize', resizeCanvas, false);
 
@@ -36,7 +39,7 @@ export function setupCanvas(
     }
   }
 
-  const handleClick = (e: PointerEvent) => {
+  const handlePointerDown = (e: PointerEvent) => {
     console.log(e);
     pointerReportElement.innerHTML = `
       <h4>Pointer Event Properties</h4>
@@ -63,11 +66,12 @@ export function setupCanvas(
       </ul>
     `;
   };
-  canvasElement.addEventListener('pointerdown', handleClick);
+  canvasElement.addEventListener('pointerdown', handlePointerDown);
 
   function onMIDISuccess(midiAccess: WebMidi.MIDIAccess) {
     console.log('MIDI ready!');
     webMidiSupportElement.innerHTML = 'Web MIDI is supported!';
+    midi = midiAccess;
     listInputsAndOutputs(midiAccess);
   }
 
@@ -76,27 +80,40 @@ export function setupCanvas(
     webMidiSupportElement.innerHTML = 'Web MIDI is not supported :(';
   }
 
+  function listInputsAndOutputs(midiAccess: WebMidi.MIDIAccess) {
+    console.log(`Number of MIDI inputs: ${[...midiAccess.inputs].length}`);
+    for (const entry of midiAccess.inputs) {
+      const input = entry[1];
+      console.log(
+        `Input port [type:'${input.type}']` +
+          ` id:'${input.id}'` +
+          ` manufacturer:'${input.manufacturer}'` +
+          ` name:'${input.name}'` +
+          ` version:'${input.version}'`
+      );
+    }
+
+    console.log(`Number of MIDI outputs: ${[...midiAccess.outputs].length}`);
+    for (const entry of midiAccess.outputs) {
+      const output = entry[1];
+      if (!firstOutputPort) firstOutputPort = output.id;
+      console.log(
+        `Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`
+      );
+    }
+  }
+
+  function handleClick() {
+    if (!midi || !firstOutputPort) return;
+    var noteOnMessage = [0x90, 60, 0x7f]; // note on, middle C, full velocity
+    var output = midi.outputs.get(firstOutputPort);
+    if (!output) return;
+    output.send(noteOnMessage); //omitting the timestamp means send immediately.
+    output.send([0x80, 60, 0x40], window.performance.now() + 1000.0); // Inlined array creation- note off, middle C,
+    // release velocity = 64, timestamp = now + 1000ms.
+  }
+
+  playNoteButtonElement.addEventListener('click', handleClick);
+
   navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
-}
-
-function listInputsAndOutputs(midiAccess: WebMidi.MIDIAccess) {
-  console.log(`Number of MIDI inputs: ${[...midiAccess.inputs].length}`);
-  for (const entry of midiAccess.inputs) {
-    const input = entry[1];
-    console.log(
-      `Input port [type:'${input.type}']` +
-        ` id:'${input.id}'` +
-        ` manufacturer:'${input.manufacturer}'` +
-        ` name:'${input.name}'` +
-        ` version:'${input.version}'`
-    );
-  }
-
-  console.log(`Number of MIDI outputs: ${[...midiAccess.outputs].length}`);
-  for (const entry of midiAccess.outputs) {
-    const output = entry[1];
-    console.log(
-      `Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`
-    );
-  }
 }
