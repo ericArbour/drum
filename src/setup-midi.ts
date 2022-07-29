@@ -12,5 +12,7 @@ export function setupMidi(
     onMidiRequest(null);
   }
 
-  navigator.requestMIDIAccess().then(onMidiSuccess, onMidiFailure);
+  navigator
+    .requestMIDIAccess({ sysex: true })
+    .then(onMidiSuccess, onMidiFailure);
 }

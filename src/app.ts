@@ -28,6 +28,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `;
 
+setupCanvas(
+  document.querySelector<HTMLCanvasElement>('#canvas')!,
+  document.querySelector<HTMLParagraphElement>('#pointer-report')!
+);
+
 setupMidi(
   document.querySelector<HTMLParagraphElement>('#web-midi-support')!,
   (midiAccess) => {
@@ -45,10 +50,5 @@ setupMidi(
         document.querySelector<HTMLButtonElement>('#play-note-button')!
       );
     }
-
-    setupCanvas(
-      document.querySelector<HTMLCanvasElement>('#canvas')!,
-      document.querySelector<HTMLParagraphElement>('#pointer-report')!
-    );
   }
 );
