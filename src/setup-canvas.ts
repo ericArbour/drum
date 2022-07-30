@@ -30,10 +30,11 @@ export function setupCanvas(
       ctx.fillStyle = 'blue';
       if (isPointerInCircle) {
         if (output) {
-          const note = 55 + i * 0.1;
+          const note = 60; // 55 + i * 0.25;
           const noteOnMessage = [0x90, note, 0x7f]; // note on, middle C, full velocity
           output.send(noteOnMessage); //omitting the timestamp means send immediately.
-          output.send([0x80, note, 0x40], window.performance.now() + 1000.0); // Inlined array creation- note off, middle C,
+          output.send([0xe0, 0x00, i - 1]);
+          output.send([0x80, note, 0x40], window.performance.now() + 2000.0); // Inlined array creation- note off, middle C,
         }
         ctx.fill();
       }
