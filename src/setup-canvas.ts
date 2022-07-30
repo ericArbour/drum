@@ -1,9 +1,10 @@
 export function setupCanvas(
   canvasElement: HTMLCanvasElement,
-  pointerReportElement: HTMLParagraphElement
+  pointerReportElement: HTMLParagraphElement,
+  output: WebMidi.MIDIOutput | undefined
 ) {
   function drawCircles(pointerPos?: Position) {
-    const ringCount = 16;
+    const ringCount = 128;
     const { height, width } = canvasElement;
     const minDim = Math.min(height, width);
     const circleRadius = Math.floor(minDim / (ringCount * 2));
@@ -16,16 +17,26 @@ export function setupCanvas(
     const ctx = canvasElement.getContext('2d')!;
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    for (let i = ringCount; i >= 0; i--) {
+    for (let i = ringCount; i >= 1; i--) {
       const currentRadius = circleRadius * i;
+      const nextRadius = circleRadius * (i - 1);
+      const isPointerInCircle = pointerDist
+        ? pointerDist < currentRadius && pointerDist >= nextRadius // -2 for borders
+        : false;
+
       ctx.beginPath();
       ctx.arc(center.x, center.y, currentRadius, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.fillStyle = 'blue';
-      const isPointerInCircle = pointerDist
-        ? pointerDist >= currentRadius - (circleRadius + 2) // + 2 for borders
-        : false;
-      if (isPointerInCircle) ctx.fill();
+      if (isPointerInCircle) {
+        if (output) {
+          const note = 55 + i * 0.1;
+          const noteOnMessage = [0x90, note, 0x7f]; // note on, middle C, full velocity
+          output.send(noteOnMessage); //omitting the timestamp means send immediately.
+          output.send([0x80, note, 0x40], window.performance.now() + 1000.0); // Inlined array creation- note off, middle C,
+        }
+        ctx.fill();
+      }
     }
   }
 

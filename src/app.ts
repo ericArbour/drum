@@ -3,7 +3,6 @@ import { setupCanvas } from './setup-canvas';
 import { setupMidi } from './setup-midi';
 import { setupMidiInputs } from './setup-midi-inputs';
 import { setupMidiOutputs } from './setup-midi-outputs';
-import { setupPlayButton } from './setup-play-button';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main id="main">
@@ -11,7 +10,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <article>
       <h2>Canvas</h2>
       <canvas id="canvas"></canvas>
-      <button id="play-note-button">Play Note</button>
       <aside>
         <h3>WebMIDI Support</h3>
         <p id="web-midi-support">Checking if WebMIDI is supported...</p>
@@ -28,11 +26,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `;
 
-setupCanvas(
-  document.querySelector<HTMLCanvasElement>('#canvas')!,
-  document.querySelector<HTMLParagraphElement>('#pointer-report')!
-);
-
 setupMidi(
   document.querySelector<HTMLParagraphElement>('#web-midi-support')!,
   (midiAccess) => {
@@ -45,9 +38,10 @@ setupMidi(
         midiAccess,
         document.querySelector<HTMLUListElement>('#midi-outputs')!
       );
-      setupPlayButton(
-        firstOutput,
-        document.querySelector<HTMLButtonElement>('#play-note-button')!
+      setupCanvas(
+        document.querySelector<HTMLCanvasElement>('#canvas')!,
+        document.querySelector<HTMLParagraphElement>('#pointer-report')!,
+        firstOutput
       );
     }
   }
